@@ -156,7 +156,7 @@ router.post("/share/:id", protect, async (req, res) => {
 
     await doc.save();
 
-    const shareLink = `http://localhost:5000/api/documents/shared/${token}`;
+    const shareLink = `${process.env.BASE_URL}/api/documents/shared/${token}`;
 
     res.json({ shareLink, expiresAt: expiry });
 
