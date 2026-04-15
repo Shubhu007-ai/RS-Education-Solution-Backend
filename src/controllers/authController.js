@@ -51,18 +51,12 @@ export const signup = async (req, res) => {
     }
 
     // 📩 SEND OTP EMAIL
-    await sendMail(
-      email,
-      "Verify Your Email",
-      otp,
-      user.name
-    );
+    await sendMail(email, "Verify Your Email", otp, user.name);
 
     res.status(200).json({
       message: "OTP sent to email. Please verify.",
       email,
     });
-
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -93,12 +87,7 @@ export const login = async (req, res) => {
 
       await user.save();
 
-      await sendMail(
-        email,
-        "Verify Your Email",
-        otp,
-        user.name
-      );
+      await sendMail(email, "Verify Your Email", otp, user.name);
 
       return res.status(403).json({
         message: "Email not verified. OTP sent again.",
@@ -124,9 +113,9 @@ export const login = async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
+        role: user.role,
       },
     });
-
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -151,18 +140,12 @@ export const forgotPassword = async (req, res) => {
 
     await user.save();
 
-    await sendMail(
-      email,
-      "Password Reset OTP",
-      otp,
-      user.name
-    );
+    await sendMail(email, "Password Reset OTP", otp, user.name);
 
     res.json({
       message: "OTP sent to email",
       email,
     });
-
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -185,7 +168,6 @@ export const verifyForgotOtp = async (req, res) => {
       message: "OTP verified",
       email,
     });
-
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -216,7 +198,6 @@ export const resetPassword = async (req, res) => {
     res.json({
       message: "Password reset successful",
     });
-
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -230,7 +211,6 @@ export const getMe = async (req, res) => {
     const user = await User.findById(req.user).select("-password");
 
     res.json(user);
-
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -277,9 +257,9 @@ export const verifyOtp = async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
+        role: user.role,
       },
     });
-
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -305,15 +285,9 @@ export const resendOtp = async (req, res) => {
 
     await user.save();
 
-    await sendMail(
-      email,
-      "Resend OTP",
-      otp,
-      user.name
-    );
+    await sendMail(email, "Resend OTP", otp, user.name);
 
     res.json({ message: "OTP resent successfully" });
-
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -322,7 +296,6 @@ export const resendOtp = async (req, res) => {
 // ===============================
 // 🔹 GOOGLE AUTH
 // ===============================
-
 
 export const googleAuth = async (req, res) => {
   try {
@@ -335,7 +308,6 @@ export const googleAuth = async (req, res) => {
 
     // ✅ EXISTING GOOGLE USER
     if (user && user.provider === "google") {
-
       // ❗ CHECK VERIFICATION
       if (!user.isVerified) {
         const otp = generateOTP();
@@ -363,13 +335,13 @@ export const googleAuth = async (req, res) => {
           id: user._id,
           name: user.name,
           email: user.email,
+          role: user.role,
         },
       });
     }
 
     // 🔄 EXISTING LOCAL USER → LINK GOOGLE ACCOUNT
     if (user && user.provider !== "google") {
-
       user.provider = "google";
       user.googleId = googleId;
 
@@ -402,6 +374,7 @@ export const googleAuth = async (req, res) => {
           id: user._id,
           name: user.name,
           email: user.email,
+          role: user.role,
         },
       });
     }
@@ -426,7 +399,6 @@ export const googleAuth = async (req, res) => {
       email,
       isNewUser: true,
     });
-
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -456,9 +428,13 @@ export const setPassword = async (req, res) => {
     res.json({
       message: "Password set successfully",
       token,
-      user,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
     });
-
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -475,15 +451,8 @@ export const updateProfile = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const {
-      name,
-      phone,
-      school,
-      exam,
-      score,
-      universities,
-      academic,
-    } = req.body;
+    const { name, phone, school, exam, score, universities, academic } =
+      req.body;
 
     if (academic) {
       user.academic = {
@@ -502,14 +471,13 @@ export const updateProfile = async (req, res) => {
 
     // 🔐 REMOVE SENSITIVE FIELDS
     const safeUser = await User.findById(updatedUser._id).select(
-      "-password -otp -otpExpiry -resetToken -resetTokenExpiry -googleId"
+      "-password -otp -otpExpiry -resetToken -resetTokenExpiry -googleId",
     );
 
     res.json({
       message: "Profile updated successfully",
       user: safeUser,
     });
-
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
