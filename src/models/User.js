@@ -17,6 +17,12 @@ const userSchema = new mongoose.Schema(
       trim: true,
     },
 
+    role: {
+      type: String,
+      enum: ["user", "admin"],
+      default: "user",
+    },
+
     phone: {
       type: String,
       trim: true,
@@ -94,7 +100,7 @@ const userSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 const User = mongoose.model("User", userSchema);

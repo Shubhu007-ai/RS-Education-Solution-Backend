@@ -8,6 +8,8 @@ import taskRoutes from "./routes/taskRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import documentRoutes from "./routes/documentRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
+import ticketRoutes from "./routes/ticketRoutes.js";
+import bookingRoutes from "./routes/bookingRoutes.js";
 const app = express();
 
 
@@ -49,6 +51,10 @@ app.use("/api/documents", documentRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 
 app.use("/api/tasks", taskRoutes);
+
+app.use("/api/tickets", ticketRoutes);
+
+app.use("/api/bookings", bookingRoutes);
 
 // ===============================
 // 🔹 HEALTH CHECK (optional)
