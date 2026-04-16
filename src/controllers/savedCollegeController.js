@@ -16,6 +16,8 @@ export const saveCollege = async (req, res) => {
       placement_avg_lpa,
       naac_grade,
       reason,
+      entrance_exam,
+      website,
       collegeId,
     } = req.body;
 
@@ -41,6 +43,8 @@ export const saveCollege = async (req, res) => {
       placement_avg_lpa,
       naac_grade,
       reason,
+      entrance_exam,
+      website,
       collegeId,
     });
 

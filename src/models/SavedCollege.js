@@ -23,13 +23,16 @@ const savedCollegeSchema = new mongoose.Schema(
 
     reason: String,
 
+    entrance_exam: [String],
+    website: String,
+
     // 🔥 important unique identifier
     collegeId: {
       type: String,
       required: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export default mongoose.model("SavedCollege", savedCollegeSchema);
