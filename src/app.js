@@ -12,6 +12,7 @@ import ticketRoutes from "./routes/ticketRoutes.js";
 import bookingRoutes from "./routes/bookingRoutes.js";
 import savedCollegeRoutes from "./routes/savedCollegeRoutes.js";
 import contactRoutes from "./routes/contactRoutes.js";
+import guidanceRoutes from "./routes/guidanceRoutes.js";
 const app = express();
 
 
@@ -59,6 +60,7 @@ app.use("/api/tickets", ticketRoutes);
 app.use("/api/bookings", bookingRoutes);
 app.use("/api", savedCollegeRoutes);
 app.use("/api/contact", contactRoutes);
+app.use("/api/guidance", guidanceRoutes);
 
 // ===============================
 // 🔹 HEALTH CHECK (optional)
