@@ -1,5 +1,6 @@
 import Guidance from "../models/Guidance.js";
 import User from "../models/User.js";
+import { io } from "../server.js";
 
 export const createGuidance = async (req, res) => {
   try {
@@ -37,6 +38,8 @@ export const createGuidance = async (req, res) => {
       selectedCourse,
       message,
     });
+
+    io.emit("new-guidance", guidance);
 
     /* =========================
        RESPONSE

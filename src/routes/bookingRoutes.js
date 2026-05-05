@@ -1,5 +1,6 @@
 import express from "express";
 import { createBooking } from "../controllers/bookingController.js";
+import User from "../models/User.js";
 import { protect } from "../middleware/authMiddleware.js";
 import Booking from "../models/Booking.js";
 
@@ -7,7 +8,6 @@ const router = express.Router();
 
 // ✅ CREATE BOOKING (USER)
 router.post("/create", protect, createBooking);
-
 
 // ===============================
 // 🔥 ADMIN ROUTE (IMPORTANT)
@@ -26,17 +26,23 @@ router.get("/all", protect, async (req, res) => {
 // ✅ DELETE BOOKING
 router.delete("/:id", protect, async (req, res) => {
   try {
-    const user = await User.findById(req.user);
+    const user = await User.findById(req.user._id || req.user);
 
-    if (user.role !== "admin") {
+    if (!user || user.role !== "admin") {
       return res.status(403).json({ message: "Access denied" });
     }
 
-    await Booking.findByIdAndDelete(req.params.id);
+    const booking = await Booking.findById(req.params.id);
 
-    res.json({ message: "Booking deleted" });
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
 
+    await booking.deleteOne();
+
+    res.json({ message: "Booking deleted successfully" });
   } catch (err) {
+    console.error("DELETE BOOKING ERROR:", err);
     res.status(500).json({ message: err.message });
   }
 });
