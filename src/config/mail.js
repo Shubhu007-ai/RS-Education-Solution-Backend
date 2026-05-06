@@ -99,7 +99,7 @@ export const sendMail = async ({ to, subject, type = "otp", data = {} }) => {
 
     console.log("✅ Email sent");
   } catch (error) {
-    console.error("❌ Email error:", error.message);
+    console.error("❌ FULL EMAIL ERROR:", error);
     throw new Error("Email failed");
   }
 };
