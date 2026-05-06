@@ -15,7 +15,7 @@ import contactRoutes from "./routes/contactRoutes.js";
 import guidanceRoutes from "./routes/guidanceRoutes.js";
 const app = express();
 
-
+app.set("trust proxy", 1);
 // ===============================
 // 🔹 MIDDLEWARE
 // ===============================
