@@ -340,30 +340,6 @@ export const googleAuth = async (req, res) => {
 
     // ✅ EXISTING GOOGLE USER
     if (user && user.provider === "google") {
-      // ❗ CHECK VERIFICATION
-      if (!user.isVerified) {
-        const otp = generateOTP();
-
-        user.otp = otp;
-        user.otpExpiry = otpExpiryTime();
-        await user.save();
-
-        await sendMail({
-          to: email,
-          subject: "Verify Your Email",
-          type: "otp",
-          data: {
-            name: user.name,
-            otp,
-          },
-        });
-
-        return res.status(403).json({
-          message: "Email not verified. OTP sent.",
-          email,
-          isVerified: false,
-        });
-      }
 
       // ✅ VERIFIED → LOGIN
       const jwtToken = generateToken(user._id);
@@ -387,31 +363,6 @@ export const googleAuth = async (req, res) => {
 
       await user.save();
 
-      // ❗ IF NOT VERIFIED → SEND OTP
-      if (!user.isVerified) {
-        const otp = generateOTP();
-
-        user.otp = otp;
-        user.otpExpiry = otpExpiryTime();
-        await user.save();
-
-        await sendMail({
-          to: email,
-          subject: "Verify Your Email",
-          type: "otp",
-          data: {
-            name: user.name,
-            otp,
-          },
-        });
-
-        return res.status(403).json({
-          message: "Email not verified. OTP sent.",
-          email,
-          isVerified: false,
-        });
-      }
-
       // ✅ LOGIN DIRECTLY
       const jwtToken = generateToken(user._id);
 
@@ -428,32 +379,26 @@ export const googleAuth = async (req, res) => {
     }
 
     // 🆕 NEW USER → OTP
-    const otp = generateOTP();
-
+    // 🆕 NEW GOOGLE USER → DIRECT LOGIN
     user = await User.create({
       name,
       email,
       googleId,
       provider: "google",
-      isVerified: false,
-      otp,
-      otpExpiry: otpExpiryTime(),
+      isVerified: true,
     });
 
-    await sendMail({
-      to: email,
-      subject: "Verify Your Email",
-      type: "otp",
-      data: {
-        name: user.name,
-        otp,
-      },
-    });
+    const jwtToken = generateToken(user._id);
 
     return res.status(200).json({
-      message: "OTP sent to email",
-      email,
-      isNewUser: true,
+      message: "Google signup successful",
+      token: jwtToken,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
