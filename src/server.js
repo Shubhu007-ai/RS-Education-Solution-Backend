@@ -10,7 +10,7 @@ const server = http.createServer(app);
 
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://rs-education-solution-frontend.vercel.app"
+  "https://rseducationsolution.in"
 ];
 
 export const io = new Server(server, {
