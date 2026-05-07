@@ -1,4 +1,3 @@
-import nodemailer from "nodemailer";
 import { google } from "googleapis";
 
 const OAuth2 = google.auth.OAuth2;
@@ -20,28 +19,13 @@ export const sendMail = async ({
   data = {},
 }) => {
   try {
-    // ✅ Generate access token
     const accessToken = await oauth2Client.getAccessToken();
 
     console.log("✅ ACCESS TOKEN GENERATED");
 
-    // ✅ Gmail OAuth2 Transport
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-
-      auth: {
-        type: "OAuth2",
-
-        user: process.env.EMAIL_USER,
-
-        clientId: process.env.GOOGLE_CLIENT_ID,
-
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-
-        refreshToken: process.env.GOOGLE_REFRESH_TOKEN,
-
-        accessToken: accessToken.token,
-      },
+    const gmail = google.gmail({
+      version: "v1",
+      auth: oauth2Client,
     });
 
     let htmlTemplate = "";
@@ -128,12 +112,31 @@ export const sendMail = async ({
       </div>`;
     }
 
-    // ✅ SEND EMAIL
-    await transporter.sendMail({
-      from: `"RS Education" <${process.env.EMAIL_USER}>`,
-      to,
-      subject,
-      html: htmlTemplate,
+    // ✅ RAW EMAIL
+    const messageParts = [
+      `From: RS Education <${process.env.EMAIL_USER}>`,
+      `To: ${to}`,
+      `Subject: ${subject}`,
+      "MIME-Version: 1.0",
+      "Content-Type: text/html; charset=utf-8",
+      "",
+      htmlTemplate,
+    ];
+
+    const message = messageParts.join("\n");
+
+    const encodedMessage = Buffer.from(message)
+      .toString("base64")
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_")
+      .replace(/=+$/, "");
+
+    // ✅ SEND USING GMAIL API
+    await gmail.users.messages.send({
+      userId: "me",
+      requestBody: {
+        raw: encodedMessage,
+      },
     });
 
     console.log("✅ EMAIL SENT SUCCESSFULLY");
