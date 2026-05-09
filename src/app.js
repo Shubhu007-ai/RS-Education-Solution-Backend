@@ -13,6 +13,8 @@ import bookingRoutes from "./routes/bookingRoutes.js";
 import savedCollegeRoutes from "./routes/savedCollegeRoutes.js";
 import contactRoutes from "./routes/contactRoutes.js";
 import guidanceRoutes from "./routes/guidanceRoutes.js";
+import leadRoutes from "./routes/leadRoutes.js";
+
 const app = express();
 
 app.set("trust proxy", 1);
@@ -72,6 +74,7 @@ app.use("/api/bookings", bookingRoutes);
 app.use("/api", savedCollegeRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/guidance", guidanceRoutes);
+app.use("/api/leads", leadRoutes);
 
 // ===============================
 // 🔹 HEALTH CHECK (optional)
